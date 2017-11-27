@@ -90,6 +90,10 @@ along with GCC; see the file COPYING3.  If not see
     }								\
   while (0)
 
+/* Some architectures need frame pointer, so I'm being lazy here. */
+#undef  SUBTARGET_FRAME_POINTER_REQUIRED
+#define SUBTARGET_FRAME_POINTER_REQUIRED 1
+
 /* Not supported yet.  */
 # undef TARGET_THREAD_SSP_OFFSET
 
@@ -104,6 +108,16 @@ along with GCC; see the file COPYING3.  If not see
 /* Add .note.GNU-stack.  */
 #undef TARGET_ASM_FILE_END
 #define TARGET_ASM_FILE_END file_end_indicate_exec_stack
+
+/* SUBTARGET_FRAME_POINTER_REQUIRED somehow doesn't work on i386. More laziness. */
+#define HELENOS_DRIVER_COMMON_SPECS "-fno-omit-frame-pointer"
+
+#ifndef HELENOS_DRIVER_ARCH_SPECS
+#define HELENOS_DRIVER_ARCH_SPECS ""
+#endif
+
+#undef  DRIVER_SELF_SPECS
+#define DRIVER_SELF_SPECS  HELENOS_DRIVER_COMMON_SPECS, HELENOS_DRIVER_ARCH_SPECS
 
 /* There is absolutely no reason for wchar_t and wint_t to vary with architecture. */
 

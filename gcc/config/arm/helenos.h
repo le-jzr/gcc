@@ -75,6 +75,8 @@ extern void __helenos_clear_instruction_cache(void *begin, void *end);
 
 #undef LIBGCC_SPEC
 
+// TODO: We currently use APCS frame, but eventually we want to switch to
+// a metadata-based unwinder.
 #undef  TARGET_DEFAULT
 #define TARGET_DEFAULT (MASK_APCS_FRAME | MASK_INTERWORK | TARGET_ENDIAN_DEFAULT)
 
@@ -90,11 +92,6 @@ extern void __helenos_clear_instruction_cache(void *begin, void *end);
    prologue knows to save it.  */
 #define PROFILE_HOOK(X)						\
   emit_clobber (gen_rtx_REG (SImode, LR_REGNUM))
-
-/* The GNU/Linux profiler needs a frame pointer.  */
-//#define SUBTARGET_FRAME_POINTER_REQUIRED crtl->profile
-#undef  SUBTARGET_FRAME_POINTER_REQUIRED
-#define SUBTARGET_FRAME_POINTER_REQUIRED 1
 
 /* Add .note.GNU-stack.  */
 #undef NEED_INDICATE_EXEC_STACK
@@ -115,7 +112,13 @@ extern void __helenos_clear_instruction_cache(void *begin, void *end);
 #undef ARM_TARGET2_DWARF_FORMAT
 #define ARM_TARGET2_DWARF_FORMAT (DW_EH_PE_pcrel | DW_EH_PE_indirect)
 
+/* Additional HelenOS flags. */
+#define HELENOS_DRIVER_ARCH_SPECS  MCPU_MTUNE_NATIVE_SPECS TARGET_MODE_SPECS "-ffixed-r9 -mtp=soft"
+
+
 #if 0
+
+// TODO: adapt this for our flags
 
 #define SUBTARGET_OVERRIDE_INTERNAL_OPTIONS				\
 do {									\

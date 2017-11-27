@@ -118,11 +118,12 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
   "%{!EB:%{!EL:%(endian_spec)}}",					\
   "%{!mabi=*: -" MULTILIB_ABI_DEFAULT "}"
 
-#undef DRIVER_SELF_SPECS
-#define DRIVER_SELF_SPECS \
-  MIPS_ISA_LEVEL_SPEC,    \
+/* Additional HelenOS flags. */
+#define HELENOS_DRIVER_ARCH_SPECS  \
+  MIPS_ISA_LEVEL_SPEC, \
   BASE_DRIVER_SELF_SPECS, \
-  LINUX_DRIVER_SELF_SPECS
+  LINUX_DRIVER_SELF_SPECS, \
+  "-msoft-float", -mabi=32"
 
 #undef LOCAL_LABEL_PREFIX
 #define LOCAL_LABEL_PREFIX (TARGET_OLDABI ? "$" : ".")
