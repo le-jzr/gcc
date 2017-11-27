@@ -21,8 +21,17 @@ along with GCC; see the file COPYING3.  If not see
 /* Unsigned char produces much better code than signed.  */
 #define DEFAULT_SIGNED_CHAR 0
 
-#define CLEAR_INSN_CACHE(BEG, END) not_used
+#ifdef __cplusplus__
+extern "C" {
+#endif
+extern void __helenos_clear_instruction_cache(void *begin, void *end);
+#ifdef __cplusplus__
+}
+#endif
 
+#define CLEAR_INSN_CACHE(begin, end) __helenos_clear_instruction_cache(begin, end)
+
+#undef  HELENOS_ARCH_OS_CPP_BUILTINS
 #define HELENOS_ARCH_OS_CPP_BUILTINS() TARGET_BPABI_CPP_BUILTINS()
 
 #undef  FPUTYPE_DEFAULT
@@ -83,7 +92,9 @@ along with GCC; see the file COPYING3.  If not see
   emit_clobber (gen_rtx_REG (SImode, LR_REGNUM))
 
 /* The GNU/Linux profiler needs a frame pointer.  */
-#define SUBTARGET_FRAME_POINTER_REQUIRED crtl->profile
+//#define SUBTARGET_FRAME_POINTER_REQUIRED crtl->profile
+#undef  SUBTARGET_FRAME_POINTER_REQUIRED
+#define SUBTARGET_FRAME_POINTER_REQUIRED 1
 
 /* Add .note.GNU-stack.  */
 #undef NEED_INDICATE_EXEC_STACK
