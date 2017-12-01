@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-typedef int pid_t;
+typedef __SIZE_TYPE__  size_t;
+typedef int            pid_t;
 
 #ifdef __cplusplus__
 }

@@ -3,6 +3,8 @@
 
 #include <stdarg.h>
 
+#include <sys/types.h>
+
 #ifdef __cplusplus__
 extern "C" {
 #endif
@@ -10,28 +12,31 @@ extern "C" {
 struct _FILE;
 typedef struct _FILE FILE;
 
-extern int fprintf(FILE *__restrict__, const char *__restrict__, ...);
-extern int fflush(FILE *);
-extern FILE *__stderr();
-extern FILE *__stdin();
-extern FILE *__stdout();
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
 
-#define stderr  (__stderr())
-#define stdin   (__stdin())
-#define stdout  (__stdout())
+#define stderr  stderr
+#define stdin   stdin
+#define stdout  stdout
 
-extern int      fseek(FILE *, long, int);
-extern FILE    *fopen(const char *__restrict__, const char *__restrict__);
-extern int      fclose(FILE *);
-extern void     setbuf(FILE *__restrict__, char *__restrict__);
-extern __SIZE_TYPE__   fread(void *__restrict__, __SIZE_TYPE__, __SIZE_TYPE__, FILE *__restrict__);
-extern __SIZE_TYPE__   fwrite(const void *__restrict__, __SIZE_TYPE__, __SIZE_TYPE__, FILE *__restrict__);
-extern long     ftell(FILE *);
-extern int      vfprintf(FILE *__restrict__, const char *__restrict__, va_list);
-// FIXME
-#define SEEK_CUR 0
-#define SEEK_END 1
-#define SEEK_SET 2
+extern int     fseek(FILE *, long, int);
+extern FILE   *fopen(const char *__restrict__, const char *__restrict__);
+extern int     fclose(FILE *);
+extern void    setbuf(FILE *__restrict__, char *__restrict__);
+extern size_t  fread(void *__restrict__, size_t, size_t, FILE *__restrict__);
+extern size_t  fwrite(const void *__restrict__, size_t, size_t, FILE *__restrict__);
+extern long    ftell(FILE *);
+extern int     vfprintf(FILE *__restrict__, const char *__restrict__, va_list);
+extern int     fprintf(FILE *__restrict__, const char *__restrict__, ...);
+extern int     fflush(FILE *);
+
+// XXX: Keep these synchronized with libc.
+#define SEEK_SET  0
+#define SEEK_CUR  1
+#define SEEK_END  2
+
+#define EOF  (-1)
 
 #ifdef __cplusplus__
 }

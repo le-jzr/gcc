@@ -7,11 +7,11 @@
 extern "C" {
 #endif
 
+/* HelenOS doesn't support fork/exec.*/
+
 static inline pid_t fork(void) {
 	abort();
 }
-
-extern char **environ;
 
 static inline int execl(const char *path, const char *arg0, ...) {
 	abort();
