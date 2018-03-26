@@ -18,22 +18,7 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#undef LINK_SPEC
-#define LINK_SPEC "\
-  %{shared:-shared} \
-  %{!shared: \
-    %{!static: \
-      %{rdynamic:-export-dynamic} \
-      -dynamic-linker " HELENOS_DYNAMIC_LINKER "} \
-      %{static:-static}}"
-
 #define JMP_BUF_SIZE  76
-
-/* Override linux.h LINK_EH_SPEC definition.
-   Signalize that because we have fde-glibc, we don't need all C shared libs
-   linked against -lgcc_s.  */
-#undef LINK_EH_SPEC
-#define LINK_EH_SPEC ""
 
 #undef TARGET_INIT_LIBFUNCS
 #define TARGET_INIT_LIBFUNCS ia64_soft_fp_init_libfuncs

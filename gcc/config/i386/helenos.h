@@ -37,12 +37,10 @@ along with GCC; see the file COPYING3.  If not see
 
 #define HELENOS_ARCH_CPP_SPEC "-D__LE__"
 
-#undef CC1_SPEC
-#define CC1_SPEC "%(cc1_cpu)"
-
 /* HelenOS's userspace thread switching isn't compatible with direct seg refs. */
+/* Equivalent to -mno-tls-direct-seg-refs */
 #undef TARGET_TLS_DIRECT_SEG_REFS_DEFAULT
 #define TARGET_TLS_DIRECT_SEG_REFS_DEFAULT 0
 
-#undef SUBTARGET_EXTRA_SPECS
-#define SUBTARGET_EXTRA_SPECS
+#define GNU_USER_DYNAMIC_LINKER HELENOS_DYNAMIC_LINKER
+#define GNU_USER_LINK_EMULATION "elf_i386"

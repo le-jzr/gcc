@@ -18,29 +18,51 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-/* We reuse definitions from gnu-user.h, with minor modifications. */
+/* We reuse definitions from gnu-user.h, with minor modifications.
+ *
+ * Anything that can be defined using a regular specfile is done there,
+ * because they are easier to debug and modify.
+ * Only do things here that cannot be done in a specfile, or must be available
+ * for libgcc build.
+ */
+
+
+/* XXX: We defer these to the textual specfiles. */
+#undef  STARTFILE_SPEC
+#define STARTFILE_SPEC ""
+#undef  ENDFILE_SPEC
+#define ENDFILE_SPEC ""
+#undef  LIB_SPEC
+#define LIB_SPEC ""
+#undef LINK_EH_SPEC
+#define LINK_EH_SPEC ""
+#undef LINK_GCC_C_SEQUENCE_SPEC
+#define LINK_GCC_C_SEQUENCE_SPEC ""
+
+#undef CPLUSPLUS_CPP_SPEC
+#define CPLUSPLUS_CPP_SPEC "%(cpp)"
+
+#ifndef HELENOS_ARCH_CPP_SPEC
+#define HELENOS_ARCH_CPP_SPEC
+#endif
+
+#undef CPP_SPEC
+#define CPP_SPEC "-D_REENTRANT"
+
+/* SUBTARGET_FRAME_POINTER_REQUIRED somehow doesn't work on i386.
+ * Am I doing this right?
+ */
+#define HELENOS_DRIVER_COMMON_SPECS "-fno-omit-frame-pointer"
+
+#ifndef HELENOS_DRIVER_ARCH_SPECS
+#define HELENOS_DRIVER_ARCH_SPECS ""
+#endif
+
+#undef  DRIVER_SELF_SPECS
+#define DRIVER_SELF_SPECS  HELENOS_DRIVER_COMMON_SPECS, HELENOS_DRIVER_ARCH_SPECS
 
 /* Don't assume anything about the header files.  */
 #define NO_IMPLICIT_EXTERN_C
-
-/* TODO: switch to a more standard startfile naming. */
-#undef  STARTFILE_SPEC
-#define STARTFILE_SPEC "entry.o"
-
-/* TODO: we currently have no endfile, and no support for static destructors. */
-#undef  ENDFILE_SPEC
-#define ENDFILE_SPEC ""
-
-#undef  LIB_SPEC
-#define LIB_SPEC "%{pthread:-lpthread -lposix} %{posix:-lposix} -lc -lsoftfloat -lsoftint"
-
-#if defined(HAVE_LD_EH_FRAME_HDR)
-#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
-#endif
-
-#undef LINK_GCC_C_SEQUENCE_SPEC
-#define LINK_GCC_C_SEQUENCE_SPEC \
-  "%{static:--start-group} %G %L %{static:--end-group}%{!static:%G}"
 
 /* Use --as-needed -lgcc_s for eh support.  */
 #ifdef HAVE_LD_AS_NEEDED
@@ -51,17 +73,7 @@ along with GCC; see the file COPYING3.  If not see
 #undef TARGET_LIBC_HAS_FUNCTION
 #define TARGET_LIBC_HAS_FUNCTION gnu_libc_has_function
 
-#undef CPLUSPLUS_CPP_SPEC
-#define CPLUSPLUS_CPP_SPEC "%(cpp)"
-
-#ifndef HELENOS_ARCH_CPP_SPEC
-#define HELENOS_ARCH_CPP_SPEC
-#endif
-
-#undef CPP_SPEC
-#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} -D_REENTRANT"
-
-/* This disables gcov. */
+/* FIXME: Not sure what this does or why we want this. */
 #undef TARGET_POSIX_IO
 
 #define HELENOS_DYNAMIC_LINKER "/lib/ld.so.0"
@@ -71,9 +83,7 @@ along with GCC; see the file COPYING3.  If not see
 
 #define HELENOS_CPP_BUILTINS()						\
     do {								\
-	builtin_define ("__HelenOS__");					\
 	builtin_define ("__helenos__");					\
-	builtin_assert ("system=HelenOS");				\
 	builtin_assert ("system=helenos");				\
     } while (0)
 
@@ -90,22 +100,32 @@ along with GCC; see the file COPYING3.  If not see
     }								\
   while (0)
 
-/* Not supported yet.  */
-# undef TARGET_THREAD_SSP_OFFSET
+/* Some architectures need frame pointer, so I'm trying to be lazy here. */
+#undef  SUBTARGET_FRAME_POINTER_REQUIRED
+#define SUBTARGET_FRAME_POINTER_REQUIRED 1
 
-/* Not supported yet.  */
-# undef TARGET_CAN_SPLIT_STACK
-# undef TARGET_THREAD_SPLIT_STACK_OFFSET
-
-/* Not supported yet.  */
+/* Not supported (yet?).  */
+#undef TARGET_THREAD_SSP_OFFSET
+#undef TARGET_CAN_SPLIT_STACK
+#undef TARGET_THREAD_SPLIT_STACK_OFFSET
 #undef STACK_CHECK_MOVING_SP
 #undef STACK_CHECK_STATIC_BUILTIN
 
-/* Add .note.GNU-stack.  */
-#undef TARGET_ASM_FILE_END
-#define TARGET_ASM_FILE_END file_end_indicate_exec_stack
+#ifdef __cplusplus__
+extern "C" {
+#endif
+extern void __helenos_clear_icache(void *begin, void *end);
+#ifdef __cplusplus__
+}
+#endif
 
-/* There is absolutely no reason for wchar_t and wint_t to vary with architecture. */
+/* Emit on all architectures and let libc sort it out. */
+#define CLEAR_INSN_CACHE(begin, end) __helenos_clear_icache(begin, end)
+
+/* There is little reason for basic types to be inconsistent across architectures. */
+
+#undef DEFAULT_SIGNED_CHAR
+#define DEFAULT_SIGNED_CHAR 1
 
 #undef WCHAR_TYPE
 #define WCHAR_TYPE "int"
@@ -115,7 +135,7 @@ along with GCC; see the file COPYING3.  If not see
 #define WINT_TYPE "int"
 
 #undef PTRDIFF_TYPE
-#define PTRDIFF_TYPE (LONG_TYPE_SIZE == 64 ? "long int" : "int")
+#define PTRDIFF_TYPE INTPTR_TYPE
 #undef SIZE_TYPE
-#define SIZE_TYPE (LONG_TYPE_SIZE == 64 ? "long unsigned int" : "unsigned int")
+#define SIZE_TYPE UINTPTR_TYPE
 

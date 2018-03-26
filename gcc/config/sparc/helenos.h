@@ -18,6 +18,8 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/* XXX: Most of this file is "borrowed" from elsewhere, as are the comments. */
+
 /* On Linux, the combination sparc64-* --with-cpu=v8 is supported and
    selects a 32-bit compiler.  */
 #if defined(TARGET_64BIT_DEFAULT) && TARGET_CPU_DEFAULT >= TARGET_CPU_v9

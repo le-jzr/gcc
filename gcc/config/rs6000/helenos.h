@@ -18,17 +18,18 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/* XXX: Most of this file is "borrowed" from elsewhere, as are the comments. */
+
 #undef ASM_APP_ON
 #define ASM_APP_ON "#APP\n"
 
 #undef ASM_APP_OFF
 #define ASM_APP_OFF "#NO_APP\n"
 
-/* HelenOS doesn't support saving and restoring 64-bit regs in a 32-bit
-   process.  */
+/* FIXME: Does HelenOS support saving and restoring 64-bit regs in a 32-bit
+   process?  */
 #define OS_MISSING_POWERPC64 1
 
-/* We use glibc _mcount for profiling.  */
 #define NO_PROFILE_COUNTERS 1
 
 #undef HELENOS_ARCH_CPP_SPEC
@@ -74,6 +75,10 @@ along with GCC; see the file COPYING3.  If not see
 #ifdef TARGET_DEFAULT_LONG_DOUBLE_128
 #define RS6000_DEFAULT_LONG_DOUBLE_SIZE 128
 #endif
+
+/* Additional HelenOS flags. */
+#define HELENOS_DRIVER_ARCH_SPECS  "%{mfpu=none: %<mfpu=* \
+ 	%<msingle-float %<mdouble-float}", "-mcpu=powerpc", "-msoft-float"
 
 /* Static stack checking is supported by means of probes.  */
 #define STACK_CHECK_STATIC_BUILTIN 1

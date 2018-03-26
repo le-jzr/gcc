@@ -18,6 +18,8 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/* XXX: Most of this file is "borrowed" from elsewhere, as are the comments. */
+
 #define GNU_USER_LINK_EMULATION32 "elf32%{EB:b}%{EL:l}tsmip"
 #define GNU_USER_LINK_EMULATION64 "elf64%{EB:b}%{EL:l}tsmip"
 #define GNU_USER_LINK_EMULATIONN32 "elf32%{EB:b}%{EL:l}tsmipn32"
@@ -118,11 +120,12 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
   "%{!EB:%{!EL:%(endian_spec)}}",					\
   "%{!mabi=*: -" MULTILIB_ABI_DEFAULT "}"
 
-#undef DRIVER_SELF_SPECS
-#define DRIVER_SELF_SPECS \
-  MIPS_ISA_LEVEL_SPEC,    \
+/* Additional HelenOS flags. */
+#define HELENOS_DRIVER_ARCH_SPECS  \
+  MIPS_ISA_LEVEL_SPEC, \
   BASE_DRIVER_SELF_SPECS, \
-  LINUX_DRIVER_SELF_SPECS
+  LINUX_DRIVER_SELF_SPECS, \
+  "-msoft-float", "-mabi=32"
 
 #undef LOCAL_LABEL_PREFIX
 #define LOCAL_LABEL_PREFIX (TARGET_OLDABI ? "$" : ".")
